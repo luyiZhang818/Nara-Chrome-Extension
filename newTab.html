@@ -9,14 +9,19 @@
 
   <body>
     <div id="categories-container">
-      <button class="category-button" data-category="daily">
-        Daily Routine
-      </button>
+      <button class="category-button" data-category="daily">Daily Routine</button>
       <button class="category-button" data-category="home">Home</button>
       <button class="category-button" data-category="pet">Pet</button>
       <button class="category-button" data-category="friends">Friends</button>
       <button class="category-button" data-category="mind">Mind</button>
       <button class="category-button" data-category="others">Others</button>
+    </div>
+
+    <!-- New chatbox for GPT-4 -->
+    <div id="chatbox-container">
+      <input type="text" id="task-input" placeholder="Enter a task here..." />
+      <button id="submit-task">Submit Task</button>
+      <div id="subtasks-container"></div>
     </div>
 
     <div id="tasks-container" class="hidden">

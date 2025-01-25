@@ -211,3 +211,46 @@ document.addEventListener("DOMContentLoaded", () => {
     tasksContainer.classList.remove("hidden"); // Show tasks
   }
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+  const submitTaskButton = document.getElementById("submit-task");
+  const taskInput = document.getElementById("task-input");
+  const subtasksContainer = document.getElementById("subtasks-container");
+
+  // Disable the submit button initially
+  submitTaskButton.disabled = true;
+
+  // Enable/Disable button based on input
+  taskInput.addEventListener("input", () => {
+    submitTaskButton.disabled = !taskInput.value.trim();
+  });
+
+  // Handle task submission
+  submitTaskButton.addEventListener("click", () => {
+    console.log("Submit button clicked");
+    const task = taskInput.value.trim();
+    console.log("Task input value:", task);
+    if (task) {
+      subtasksContainer.innerHTML = "<p>Loading subtasks...</p>";
+
+      chrome.runtime.sendMessage(
+        { action: "generateSubtasks", task: "Sample task" },
+        (response) => {
+          console.log("Response received:", response);
+          if (response.subtasks) {
+            subtasksContainer.innerHTML = `<h3>Subtasks:</h3><ul>${response.subtasks
+              .map((subtask) => `<li>${subtask}</li>`)
+              .join("")}</ul>`;
+          } else if (response.error) {
+            console.error("Error from background.js:", response.error);
+            subtasksContainer.innerHTML = `<p>Error: ${response.error}</p>`;
+          }
+        }
+      );
+    } else {
+      subtasksContainer.innerHTML = "<p>Please enter a task.</p>";
+    }
+  });
+});
+
+ 
