@@ -30,29 +30,72 @@ function setMidnightAlarm() {
 // Handle messages from newTab.js for generating subtasks
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "generateSubtasks") {
-    // Call GPT wrapper
-    fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer API_TOKEN", // tbu
-      },
-      body: JSON.stringify({
-        prompt: `Break down the task "${message.task}" into 5 subtasks.`,
-        max_tokens: 100,
-      }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        const subtasks = data.choices[0].text
-          .trim()
-          .split("\n")
-          .filter(Boolean);
-        chrome.runtime.sendMessage({ action: "updateSubtasks", subtasks });
+    chrome.storage.local.get("apiKey", (data) => {
+      const apiKey = data.apiKey;
+
+      if (!apiKey) {
+        console.error("API key is missing!");
+        sendResponse({ error: "No API key found." });
+        return;
+      }
+
+      if (!message.task) {
+        console.error("Task is missing in the message payload.");
+        sendResponse({ error: "Task is missing." });
+        return;
+      }
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10000); // 10-second timeout
+
+      fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: "gpt-4", // Changed to GPT-4
+          messages: [
+            { role: "system", content: "You are a helpful productivity assistant." },
+            { role: "user", content: `Break down the task "${message.task}" into 5 subtasks.` },
+          ],
+          max_tokens: 100,
+        }),
+        signal: controller.signal,
       })
-      .catch((error) => {
-        console.error("Error generating subtasks:", error);
-      });
+        .then((response) => response.json())
+        .then((data) => {
+          clearTimeout(timeout);
+          const subtasks = data.choices[0].message.content
+            .trim()
+            .split("\n")
+            .filter(Boolean);
+
+          if (subtasks.length === 0) {
+            sendResponse({ error: "No subtasks generated. Please try again." });
+            return;
+          }
+
+          sendResponse({ subtasks });
+        })
+        .catch((error) => {
+          console.error("Error generating subtasks:", error);
+          sendResponse({ error: "Failed to generate subtasks. Please try again." });
+        });
+    });
+
     return true; // Keep the message channel open for async response
   }
+});
+
+// Verify the security key when Chrome is opened
+chrome.runtime.onStartup.addListener(() => {
+  chrome.storage.local.get("apiKey", (data) => {
+    if (data.apiKey) {
+      console.log("API key is ready for use."); // Log key existence, not value
+    } else {
+      console.error("No API key found. Please add it.");
+    }
+  });
 });
