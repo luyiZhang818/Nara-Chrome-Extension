@@ -5,7 +5,7 @@
   "version": "1.0",
   "permissions": ["storage", "alarms"],
   "background": {
-    "service_worker": "setApiKey.js"
+    "service_worker": "background.js"
   },
   "chrome_url_overrides": {
     "newtab": "newTab.html"
@@ -15,4 +15,3 @@
     "128": "assets/icon128.png"
   }
 }
-

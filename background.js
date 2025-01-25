@@ -2,28 +2,34 @@
 chrome.runtime.onInstalled.addListener(() => {
   console.log("Extension installed.");
 
-  // Set the midnight alarm
-  setMidnightAlarm();
-
   // Store API key if not already present
   chrome.storage.local.get("apiKey", (data) => {
     if (data.apiKey) {
-      console.log("API key already exists.");
+      console.log("API key already exists:", data.apiKey);
     } else {
-      chrome.storage.local.set({ apiKey: "Ysk-proj-KdmhvmM0q1RlwOinxVKe-EJWF47fjESHPSjp98tdKhGrwFY7_IutF-8kovvhsd4aBFt5MDWpMRT3BlbkFJxfnlaYpreMjxEgWHWYMUxYkCcW2kWKc4Co014Ct0xWaVUQ_k_aojHsH1uL15bjMk_wyG1OSHoA" }, () => {
-        console.log("API key stored securely!");
-      });
+      chrome.storage.local.set(
+        {
+          apiKey: "TBU", // updated when demoing
+        },
+        () => {
+          console.log("API key stored securely!");
+        }
+      );
     }
   });
+
+  // Set the midnight alarm
+  setMidnightAlarm();
 });
 
+// Verify API key and reset alarm on startup
 chrome.runtime.onStartup.addListener(() => {
   console.log("Chrome started.");
 
   // Verify the API key exists
   chrome.storage.local.get("apiKey", (data) => {
     if (data.apiKey) {
-      console.log("API key is ready for use."); // Avoid logging the actual key
+      console.log("API key is ready for use.");
     } else {
       console.error("No API key found. Please add it.");
     }
@@ -86,8 +92,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         body: JSON.stringify({
           model: "gpt-4",
           messages: [
-            { role: "system", content: "You are a helpful productivity assistant." },
-            { role: "user", content: `Break down the task "${message.task}" into 5 subtasks.` },
+            {
+              role: "system",
+              content: "You are a helpful productivity assistant.",
+            },
+            {
+              role: "user",
+              content: `Break down the task "${message.task}" into 5 subtasks.`,
+            },
           ],
           max_tokens: 100,
         }),
@@ -113,7 +125,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           if (error.name === "AbortError") {
             sendResponse({ error: "Request timed out. Please try again." });
           } else {
-            sendResponse({ error: "Failed to generate subtasks. Please check your API key and try again." });
+            sendResponse({
+              error:
+                "Failed to generate subtasks. Please check your API key and try again.",
+            });
           }
         });
     });
@@ -121,8 +136,3 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true; // Keep the message channel open for async response
   }
 });
-
-
-
-
-
