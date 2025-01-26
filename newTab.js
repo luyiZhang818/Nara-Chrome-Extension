@@ -56,6 +56,14 @@ document.addEventListener("DOMContentLoaded", () => {
       "assets/E4.jpg",
       "assets/E5.jpg",
     ],
+    custom: [
+      "assets/F.jpg",
+      "assets/F1.jpg",
+      "assets/F2.jpg",
+      "assets/F3.jpg",
+      "assets/F4.jpg",
+      "assets/F5.jpg",
+    ],
   };
 
   // Preload image function
@@ -282,7 +290,6 @@ document.addEventListener("DOMContentLoaded", () => {
             selectedCategory: category,
           },
         });
-        // Set the background to the category's origin photo (e.g., A.jpg)
         changeBackgroundWithSlide(backgroundSets[category][0]).then(() => {
           renderTasks(tasks, 0, category);
         });
@@ -305,10 +312,10 @@ document.addEventListener("DOMContentLoaded", () => {
           backgroundIndex: 0,
           categoriesHidden: true,
           isFinalImage: false,
-          selectedCategory: "others",
+          selectedCategory: "custom",
         },
       });
-      renderTasks(tasks, 0, "self");
+      renderTasks(tasks, 0, "custom");
     }
   });
 

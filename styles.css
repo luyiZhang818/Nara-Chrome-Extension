@@ -17,7 +17,6 @@ body {
     height: 100%;
     z-index: -1;
     background-color: #000;
-    /* Fallback color during transitions */
 }
 
 .background-slide {
@@ -47,7 +46,6 @@ body {
     from {
         opacity: 0;
     }
-
     to {
         opacity: 0.95;
     }
@@ -67,7 +65,6 @@ body {
     letter-spacing: 0.01em;
     text-transform: lowercase;
     white-space: nowrap;
-    /* text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); */
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
     opacity: 0.95;
     animation: welcomeFadeIn 1s ease-out forwards;
@@ -191,10 +188,6 @@ input[type="checkbox"] {
     height: 20px;
     border-radius: 6px;
     cursor: pointer;
-    width: 20px;
-    height: 20px;
-    border-radius: 6px;
-    cursor: pointer;
     appearance: none;
     border: 2px solid #9CA3AF;
     position: relative;
@@ -219,6 +212,104 @@ input[type="checkbox"]:checked::after {
     transform: rotate(45deg);
 }
 
+/* Custom Task Modal */
+.custom-task-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    max-width: 500px;
+    text-align: center;
+}
+
+.custom-task-modal .modal-content {
+    background: white;
+    text-align: left;
+    width: 90%;
+}
+
+.custom-task-modal h2 {
+    margin: 0 0 1rem;
+    color: #2c3e50;
+    font-size: 1.5rem;
+}
+
+.custom-task-modal p {
+    margin: 0 0 0.5rem;
+    color: #4a5568;
+}
+
+#custom-task-input {
+    width: 100%;
+    padding: 8px;
+    margin: 1rem 0;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-family: 'DM Sans', sans-serif;
+}
+
+#custom-task-input:focus {
+    outline: none;
+    border-color: #2F4F4F;
+    box-shadow: 0 0 0 2px rgba(47, 79, 79, 0.1);
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.modal-buttons button {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#submit-task {
+    background: #2F4F4F;
+    color: white;
+    border: none;
+}
+
+#submit-task:hover {
+    background: #1c2f2f;
+    transform: translateY(-1px);
+}
+
+#cancel-task {
+    background: white;
+    border: 1px solid #e2e8f0;
+    color: #4a5568;
+}
+
+#cancel-task:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+
 /* Sortable classes */
 .sortable-ghost {
     opacity: 0.4;
@@ -234,7 +325,7 @@ input[type="checkbox"]:checked::after {
     display: none !important;
 }
 
-/* Delete */
+/* Delete button */
 .delete-task {
     background: none;
     border: none;
@@ -272,14 +363,8 @@ input[type="checkbox"]:checked::after {
     filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.1));
 }
 
-.task-text:focus {
-    outline: none;
-    background: rgba(255, 255, 255, 0.5);
-    border-radius: 4px;
-}
-
 /* Completed task styling */
-input[type="checkbox"]:checked+.task-text {
+input[type="checkbox"]:checked + .task-text {
     text-decoration: line-through;
     color: #9CA3AF;
 }
@@ -354,53 +439,16 @@ input[type="checkbox"]:checked+.task-text {
     display: none;
 }
 
-.modal-content {
-    background: rgba(255, 255, 255, 0.8);
-    /* More translucent */
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-radius: 12px;
-    padding: 24px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    max-width: 300px;
-    text-align: center;
-}
-
-.modal-content p {
-    margin: 0 0 20px;
-    font-size: 16px;
-    color: #2c3e50;
-}
-
-.modal-buttons {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-}
-
-.modal-buttons button {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-/* Yes Button - Green (matches checkbox color) */
+/* Reset Modal Buttons */
 #reset-yes {
     background-color: #0c9623;
-    /* Green color */
     color: white;
 }
 
 #reset-yes:hover {
     background-color: #0a7a1d;
-    /* Slightly darker green on hover */
 }
 
-/* No Button - Gray */
 #reset-no {
     background-color: #6B7280;
     color: white;
@@ -408,5 +456,4 @@ input[type="checkbox"]:checked+.task-text {
 
 #reset-no:hover {
     background-color: #4B5563;
-    /* Slightly darker gray on hover */
 }
