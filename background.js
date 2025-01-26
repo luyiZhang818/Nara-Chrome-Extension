@@ -22,58 +22,109 @@ function setMidnightAlarm() {
   const now = new Date();
   const midnight = new Date();
   midnight.setHours(24, 0, 0, 0);
-
+  
   const timeUntilMidnight = (midnight - now) / (1000 * 60);
   chrome.alarms.create("dailyReset", { delayInMinutes: timeUntilMidnight });
+}
+
+async function generateSubtasksWithClaude(task, apiKey) {
+  try {
+    // Log the API key format (only first few characters for security)
+    console.log("API Key format check:", apiKey.substring(0, 9) === "sk-ant-api");
+
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "anthropic-version": "2024-01-01",
+        "authorization": `Bearer ${apiKey}`  // Changed from x-api-key to authorization
+      },
+      body: JSON.stringify({
+        model: "claude-3-sonnet-20240229",
+        max_tokens: 1024,
+        messages: [{
+          role: "user",
+          content: `Break down this task into 5 specific, actionable subtasks: "${task}". 
+                   Return only a JSON array of 5 subtasks, with no additional text.
+                   Example format: ["subtask1", "subtask2", "subtask3", "subtask4", "subtask5"]`
+        }],
+        temperature: 0.7
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error("API Response Error:", {
+        status: response.status,
+        statusText: response.statusText,
+        errorData
+      });
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log("API Response:", data);  // Log the response structure
+
+    if (!data.content || !Array.isArray(data.content) || data.content.length === 0) {
+      throw new Error('Invalid response format from Claude API');
+    }
+
+    const content = data.content[0].text;
+    const subtasks = JSON.parse(content);
+
+    return subtasks;
+
+  } catch (error) {
+    console.error("Detailed error in generateSubtasksWithClaude:", error);
+    return null;
+  }
 }
 
 // Handle messages from newTab.js for generating subtasks
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "generateSubtasks") {
-    // Call the proxy server instead of the DeepSeek API directly
-    fetch("http://localhost:3000/proxy", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        task: message.task, // The custom task input by the user
-      }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
+    // Get API key from storage
+    chrome.storage.local.get(['claudeApiKey'], async function(result) {
+      const apiKey = result.claudeApiKey;
+      
+      if (!apiKey) {
+        console.error('Claude API key not found');
+        sendFallbackTasks();
+        return;
+      }
+
+      try {
+        const subtasks = await generateSubtasksWithClaude(message.task, apiKey);
+        
+        if (subtasks && Array.isArray(subtasks) && subtasks.length === 5) {
+          chrome.runtime.sendMessage({ 
+            action: "updateSubtasks", 
+            subtasks 
+          });
+        } else {
+          throw new Error('Invalid subtasks generated');
         }
-        return response.json();
-      })
-      .then((data) => {
-        console.log("Proxy Server Response:", data); // Log the response from the proxy server
-
-        // Ensure the response contains the tasks array
-        if (!data.tasks || !Array.isArray(data.tasks)) {
-          throw new Error("Invalid response format: tasks array not found");
-        }
-
-        // Limit the number of tasks to 5
-        const subtasks = data.tasks.slice(0, 5);
-
-        // Send the subtasks back to newTab.js
-        chrome.runtime.sendMessage({ action: "updateSubtasks", subtasks });
-      })
-      .catch((error) => {
-        console.error("Error generating subtasks:", error);
-
-        // Fallback to default tasks if the API fails
-        const subtasks = [
-          "Default Task 1",
-          "Default Task 2",
-          "Default Task 3",
-          "Default Task 4",
-          "Default Task 5",
-        ];
-        chrome.runtime.sendMessage({ action: "updateSubtasks", subtasks });
-      });
+      } catch (error) {
+        console.error('Error in subtask generation:', error);
+        sendFallbackTasks();
+      }
+    });
 
     return true; // Keep the message channel open for async response
   }
 });
+
+// Helper function to send fallback tasks
+function sendFallbackTasks() {
+  const subtasks = [
+    "Default Task 1",
+    "Default Task 2",
+    "Default Task 3",
+    "Default Task 4",
+    "Default Task 5"
+  ];
+  chrome.runtime.sendMessage({ 
+    action: "updateSubtasks", 
+    subtasks 
+  });
+}

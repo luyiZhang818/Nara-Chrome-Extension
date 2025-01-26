@@ -1,9 +1,12 @@
 {
   "manifest_version": 3,
   "name": "Nara",
-  "description": "Chrome extension to manage tasks and subtasks with GPT.",
+  "description": "Chrome extension to manage tasks and subtasks with Claude.",
   "version": "1.0",
-  "permissions": ["storage", "alarms"],
+  "permissions": [
+    "storage",
+    "alarms"
+  ],
   "background": {
     "service_worker": "background.js"
   },
@@ -19,5 +22,9 @@
       "resources": ["scripts/Sortable.min.js"],
       "matches": ["<all_urls>"]
     }
-  ]
+  ],
+  "host_permissions": [
+    "https://api.anthropic.com/*"
+  ],
+  "options_page": "options.html"
 }
