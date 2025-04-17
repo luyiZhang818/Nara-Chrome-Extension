@@ -1,6 +1,6 @@
 # Nara - A Bright Start to Your Day🦌
 
-[![Chrome Web Store](Images/ChromeWebStore_Badge.jpg)](https://chromewebstore.google.com/detail/nara/cfpmbcijfhogincocklogldbkgklkene)
+[![Chrome Web Store](assets/ChromeWebStore_Badge.jpg)](https://chromewebstore.google.com/detail/nara/cfpmbcijfhogincocklogldbkgklkene)
 
 ## Introduction
 
