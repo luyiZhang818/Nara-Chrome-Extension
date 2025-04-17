@@ -1,5 +1,7 @@
 # Nara - A Bright Start to Your Day🦌
 
+[![Chrome Web Store](Images/ChromeWebStore_Badge.jpg)](https://chromewebstore.google.com/detail/nara/cfpmbcijfhogincocklogldbkgklkene)
+
 ## Introduction
 
 Nara is a Chrome extension designed to provide users with a refreshing and joyful start to their day. In a world where productivity tools often add to the stress, Nara focuses on mental relief and simple, feel-good activities. It aims to combat the habit of "bed rotting" and offers a gentle, uplifting experience every time you open a new tab. 🌿
