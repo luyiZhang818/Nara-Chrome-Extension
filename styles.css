@@ -463,3 +463,38 @@ input[type="checkbox"]:checked+.task-text {
     opacity: 0.95;
     animation: welcomeFadeIn 1s ease-out forwards;
     }
+
+    #mood-picker {
+        position: fixed;
+        bottom: 16px;
+        right: 16px;
+        display: flex;
+        gap: 8px;
+        font-size: 1.5rem;
+      }
+      
+      .mood-icon {
+        cursor: pointer;
+        transition: transform 0.2s ease;
+      }
+      .mood-icon.selected {
+        transform: scale(1.3);
+      }
+      
+      #speech-bubble {
+        position: absolute;
+        padding: 8px 12px;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        font-size: 0.9rem;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+      }
+      #speech-bubble.hidden {
+        opacity: 0;
+      }
+      #speech-bubble.visible {
+        opacity: 1;
+      }
+      
