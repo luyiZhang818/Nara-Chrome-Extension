@@ -216,6 +216,26 @@ document.addEventListener("DOMContentLoaded", () => {
     mind: getRandomTasks("mind"),
   };
 
+  const moodPicker = document.getElementById("mood-picker");
+
+  const speechBubble = document.getElementById("speech-bubble");
+  const encouragements = [
+    "Great job!",
+    "You’re making progress!",
+    "Keep going!",
+    "Nice work!",
+    "Almost there!"
+  ];
+
+  const categoryDeerMap = {
+    daily:  "deer1",
+    friends:"deer2",
+    pet:    "deer3",
+    home:   "deer4",
+    mind:   "deer5",
+    others: "deer6"
+  };
+
   // 2. Utility functions
   function parsePercentage(value) {
     return parseFloat(value.replace("%", ""));
@@ -237,6 +257,26 @@ document.addEventListener("DOMContentLoaded", () => {
       img.src = url;
     });
   }
+
+  // Load saved mood
+chrome.storage.local.get("mood", ({ mood }) => {
+  if (mood) {
+    const el = moodPicker.querySelector(`[data-mood="${mood}"]`);
+    if (el) el.classList.add("selected");
+  }
+});
+
+  // Handle clicks
+  moodPicker.addEventListener("click", (e) => {
+    if (!e.target.matches(".mood-icon")) return;
+    // clear previous
+    moodPicker.querySelectorAll(".mood-icon").forEach(i => i.classList.remove("selected"));
+    e.target.classList.add("selected");
+
+    const choice = e.target.dataset.mood;
+    chrome.storage.local.set({ mood: choice });
+  });
+
 
   // 3. Hover-related Functions
   function calculateResponsivePositions() {
@@ -579,6 +619,26 @@ document.addEventListener("DOMContentLoaded", () => {
       return a.completed ? -1 : 1;
     });
   }
+  
+  function showEncouragement(deerId) {
+    const deerEl = document.getElementById(`${deerId}-circle`);
+    if (!deerEl) return;
+    const msg = encouragements[Math.floor(Math.random() * encouragements.length)];
+  
+    // position near deer
+    const rect = deerEl.getBoundingClientRect();
+    speechBubble.textContent = msg;
+    speechBubble.style.left  = `${rect.right + 8}px`;
+    speechBubble.style.top   = `${rect.top - 4}px`;
+    speechBubble.classList.remove("hidden");
+    speechBubble.classList.add("visible");
+  
+    // hide after 2s
+    setTimeout(() => {
+      speechBubble.classList.remove("visible");
+      speechBubble.classList.add("hidden");
+    }, 2000);
+  }
 
   function renderTasks(tasks, backgroundIndex, category) {
     const tasksHeader =
@@ -632,6 +692,7 @@ document.addEventListener("DOMContentLoaded", () => {
         tasks[originalIndex].completed = checkbox.checked;
 
         if (tasks[originalIndex].completed) {
+          showEncouragement(categoryDeerMap[category]);
           const deleteButton = taskItem.querySelector(".delete-task");
           if (deleteButton) deleteButton.remove();
         }
@@ -910,6 +971,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     tasksContainer.classList.remove("hidden");
   }
+  
 
   // 6. Event Listeners
   categoriesContainer.addEventListener("click", (event) => {
@@ -1018,7 +1080,7 @@ document.addEventListener("DOMContentLoaded", () => {
           selectedCategory: "others",
         },
       });
-      renderTasks(tasks, 0, "self");
+      renderTasks(tasks, 0, "others");
     }
   });
 
