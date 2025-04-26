@@ -11,6 +11,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const resetModal = document.getElementById("reset-modal");
   const resetYesButton = document.getElementById("reset-yes");
   const resetNoButton = document.getElementById("reset-no");
+  const quoteContainer = document.getElementById("daily-quote-container");
+  const quoteTextElement = document.getElementById("daily-quote-text");
+  const quoteAuthorElement = document.getElementById("daily-quote-author");
 
   const originalImageWidth = 1456;
   const originalImageHeight = 816;
@@ -221,7 +224,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const speechBubble = document.getElementById("speech-bubble");
   const encouragements = [
     "Great job!",
-    "You’re making progress!",
+    "You're making progress!",
     "Keep going!",
     "Nice work!",
     "Almost there!"
@@ -235,6 +238,58 @@ document.addEventListener("DOMContentLoaded", () => {
     mind:   "deer5",
     others: "deer6"
   };
+
+  // Daily Quotes
+  const dailyQuotes = [
+    {
+      text: "The best way to predict the future is to create it.",
+      author: "Peter Drucker",
+    },
+    {
+      text: "You miss 100% of the shots you don't take.",
+      author: "Michael Jordan",
+    },
+    {
+      text: "Believe you can and you're halfway there.",
+      author: "Theodore Roosevelt",
+    },
+    {
+      text: "The only way to do great work is to love what you do.",
+      author: "Steve Jobs",
+    },
+    {
+      text: "Strive not to be a success, but rather to be of value.",
+      author: "Albert Einstein",
+    },
+    {
+      text: "The mind is everything. What you think you become.",
+      author: "Buddha",
+    },
+    {
+      text: "Your time is limited, don't waste it living someone else's life.",
+      author: "Steve Jobs",
+    },
+    {
+      text: "Happiness is not something ready made. It comes from your own actions.",
+      author: "Dalai Lama",
+    },
+    {
+      text: "The purpose of our lives is to be happy.",
+      author: "Dalai Lama",
+    },
+    {
+      text: "The only impossible journey is the one you never begin.",
+      author: "Tony Robbins",
+    },
+    {
+      text: "In the end, it's not the years in your life that count. It's the life in your years.",
+      author: "Abraham Lincoln",
+    },
+    {
+      text: "May you live every day of your life.",
+      author: "Jonathan Swift",
+    },
+  ];
 
   // 2. Utility functions
   function parsePercentage(value) {
@@ -1161,4 +1216,35 @@ chrome.storage.local.get("mood", ({ mood }) => {
       changeBackgroundWithSlide(initialBackground);
     }
   });
+
+  // 11. Daily Quote Logic
+  function showDailyQuote() {
+    const today = new Date().toDateString(); // Get date string (e.g., "Mon Jun 10 2024")
+
+    chrome.storage.local.get(["lastQuoteDate", "currentQuote"], (data) => {
+      if (data.lastQuoteDate === today && data.currentQuote) {
+        // Same day, show the stored quote
+        quoteTextElement.textContent = `"${data.currentQuote.text}"`;
+        quoteAuthorElement.textContent = `- ${data.currentQuote.author}`;
+        quoteContainer.classList.remove("hidden");
+      } else {
+        // New day or no stored quote, select a new random quote
+        const randomIndex = Math.floor(Math.random() * dailyQuotes.length);
+        const newQuote = dailyQuotes[randomIndex];
+
+        quoteTextElement.textContent = `"${newQuote.text}"`;
+        quoteAuthorElement.textContent = `- ${newQuote.author}`;
+        quoteContainer.classList.remove("hidden");
+
+        // Store the new quote and today's date
+        chrome.storage.local.set({
+          lastQuoteDate: today,
+          currentQuote: newQuote,
+        });
+      }
+    });
+  }
+
+  // Show the daily quote on load
+  showDailyQuote();
 });

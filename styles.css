@@ -512,3 +512,33 @@ input[type="checkbox"]:checked+.task-text {
         opacity: 1;
       }
       
+/* Daily Quote Styles */
+#daily-quote-container {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 80%;
+  text-align: center;
+  color: white;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  z-index: 10; /* Ensure it's above the background but below modals */
+  transition: opacity 0.5s ease-in-out;
+}
+
+#daily-quote-text {
+  font-size: 1.4rem; /* Adjust as needed */
+  font-style: italic;
+  margin-bottom: 5px;
+}
+
+#daily-quote-author {
+  font-size: 1.1rem; /* Adjust as needed */
+  font-weight: 300;
+}
+
+#daily-quote-container.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+      
